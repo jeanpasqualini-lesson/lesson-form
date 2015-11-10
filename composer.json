@@ -1,13 +1,20 @@
 {
     "name": "jean-pasqualini/lesson-form",
     "require": {
-        "symfony/form": "^2.7"
+        "symfony/form": "^2.7",
+        "symfony/var-dumper": "^2.7",
+        "symfony/templating" : "^2.7",
+        "symfony/twig-bridge": "2.7.*",
+        "twig/twig" : "~1.0",
+        "symfony/translation": "2.7.*",
+        "symfony/config": "2.7.*"
     },
     "autoload" :
     {
         "psr-4" :
         {
-            "" : "src/"
+            "" : "src/",
+            "Symfony\\Bundle\\FrameworkBundle\\Templating\\Helper\\" : "src/Helper/"
         }
     },
     "authors": [
