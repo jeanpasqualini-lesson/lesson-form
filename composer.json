@@ -13,8 +13,7 @@
     {
         "psr-4" :
         {
-            "" : "src/",
-            "Symfony\\Bundle\\FrameworkBundle\\Templating\\Helper\\" : "src/Helper/"
+            "" : "src/"
         }
     },
     "authors": [
