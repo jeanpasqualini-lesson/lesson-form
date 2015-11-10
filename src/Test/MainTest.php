@@ -35,11 +35,18 @@ class MainTest implements TestInterface
 
         $twig = $this->environement->getTwig();
 
+        echo "On crée le formulaire avec le factory  ...".PHP_EOL;
         $form = $formFactory->create(new OneType(), new OneData());
+
+        echo "On setData manuellement ...".PHP_EOL;
+        $form->get("un")->setData("ok");
+
+        echo "On Soumet le formulaire avec submit ...".PHP_EOL;
+        $form->submit(array());
 
         $formView = $form->createView();
 
-        echo PHP_EOL.$twig->render("test.html.twig", array(
+        echo PHP_EOL."Rendu HTML : ".PHP_EOL.$twig->render("test.html.twig", array(
                 "form" => $formView
             )).PHP_EOL;
     }
