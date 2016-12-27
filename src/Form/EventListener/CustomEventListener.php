@@ -28,12 +28,12 @@ class CustomEventListener implements EventSubscriberInterface
         $user = $event->getData();
         $form = $event->getForm();
 
-        echo "onPreSetData".PHP_EOL;
+        echo "onPreSetData<br/>".PHP_EOL;
     }
 
     public function onPostSetData(FormEvent $event)
     {
-        echo "onPostSetData".PHP_EOL;
+        echo "onPostSetData<br/>".PHP_EOL;
     }
 
     public function onPreSubmit(FormEvent $event)
@@ -41,16 +41,16 @@ class CustomEventListener implements EventSubscriberInterface
         $user = $event->getData();
         $form = $event->getForm();
 
-        echo "onPreSubmit".PHP_EOL;
+        echo "onPreSubmit<br/>".PHP_EOL;
     }
 
     public function onSubmit(FormEvent $event)
     {
-        echo "onSubmit".PHP_EOL;
+        echo "onSubmit<br/>".PHP_EOL;
     }
 
     public function onPostSubmit(FormEvent $event)
     {
-        echo "onPostSubmit".PHP_EOL;
+        echo "onPostSubmit<br/>".PHP_EOL;
     }
 }

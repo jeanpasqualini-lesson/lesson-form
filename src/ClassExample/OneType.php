@@ -4,10 +4,12 @@ use Form\ChoiceList\CustomChoiceList;
 use Form\EventListener\CustomEventListener;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
+use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use ClassExample\OneData;
+
+use Symfony\Component\Form\Extension\Core\Type as FormType;
 
 /**
  * Created by PhpStorm.
@@ -20,7 +22,7 @@ class OneType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add("un", "text")
+            ->add("un", FormType\TextType::class)
             ->add("typebizare")
             ;
 
@@ -34,75 +36,73 @@ class OneType extends AbstractType
     protected function testAllTypes(FormBuilderInterface $builder)
     {
         $builder
-            ->add("type_text", "text", array("mapped" => false, "label" => "mon label"))
-            ->add("type_textarea", "textarea", array("mapped" => false))
-            ->add("type_email", "email", array("mapped" => false))
-            ->add("type_integer", "integer", array("mapped" => false))
-            ->add("type_money", "money", array("mapped" => false))
-            ->add("type_number", "number", array("mapped" => false))
-            ->add("type_password", "password", array("mapped" => false))
-            ->add("type_percent", "percent", array("mapped" => false))
-            ->add("type_search", "search", array("mapped" => false))
-            ->add("type_url", "url", array("mapped" => false))
+            ->add("type_text",          FormType\TextType::class, array("mapped" => false, "label" => "mon label"))
+            ->add("type_textarea",      FormType\TextareaType::class, array("mapped" => false))
+            ->add("type_email",         FormType\EmailType::class, array("mapped" => false))
+            ->add("type_integer",       FormType\IntegerType::class, array("mapped" => false))
+            ->add("type_money",         FormType\MoneyType::class, array("mapped" => false))
+            ->add("type_number",        FormType\NumberType::class, array("mapped" => false))
+            ->add("type_password",      FormType\PasswordType::class, array("mapped" => false))
+            ->add("type_percent",       FormType\PercentType::class, array("mapped" => false))
+            ->add("type_search",        FormType\SearchType::class, array("mapped" => false))
+            ->add("type_url",           FormType\UrlType::class, array("mapped" => false))
             ;
 
         $builder
-            ->add("type_choice__list", "choice", array(
+            ->add("type_choice__list",  FormType\ChoiceType::class, array(
                 "mapped" => false,
                 "placeholder" => "un choix",
-                "choice_list" =>  new ChoiceList(
-                    array(1, 0.5, 0.1),
-                    array('Full', 'Half', 'Almost empty')
+                "choices" =>  array(
+                    array('Full' => 1, 'Half' => 0.5, 'Almost empty' => 0.1)
                 ),
                 "expanded" => false,
                 "multiple" => true,
             ))
-            ->add("type_choice__loader", "choice", array(
+            ->add("type_choice__loader", FormType\ChoiceType::class, array(
                 "mapped" => false,
                 "placeholder" => "un choix",
-                "choice_list" =>  new ChoiceList(
-                    array(1, 0.5, 0.1),
-                    array('Full', 'Half', 'Almost empty')
+                "choices" =>  array(
+                    array('Full' => 1, 'Half' => 0.5, 'Almost empty' => 0.1)
                 ),
                 "disabled" => true
             ))
-            ->add("type_country", "country", array("mapped" => false))
-            ->add("type_language", "language", array("mapped" => false))
-            ->add("type_locale", "locale", array("mapped" => false))
-            ->add("type_timezone", "timezone", array("mapped" => false))
-            ->add("currency", "currency", array("mapped" => false))
+            ->add("type_country",       FormType\CountryType::class, array("mapped" => false))
+            ->add("type_language",      FormType\LanguageType::class, array("mapped" => false))
+            ->add("type_locale",        FormType\LocaleType::class, array("mapped" => false))
+            ->add("type_timezone",      FormType\TimezoneType::class, array("mapped" => false))
+            ->add("currency",           FormType\CurrencyType::class, array("mapped" => false))
             ;
 
         $builder
-            ->add("type_date", "date", array("mapped" => false))
-            ->add("type_datetime", "datetime", array("mapped" => false))
-            ->add("type_time", "time", array("mapped" => false))
-            ->add("type_birthday", "birthday", array("mapped" => false))
+            ->add("type_date",          FormType\DateType::class, array("mapped" => false))
+            ->add("type_datetime",      FormType\DateTimeType::class, array("mapped" => false))
+            ->add("type_time",          FormType\TimeType::class, array("mapped" => false))
+            ->add("type_birthday",      FormType\BirthdayType::class, array("mapped" => false))
         ;
 
         $builder
-            ->add("type_checkbox", "checkbox", array("mapped" => false))
+            ->add("type_checkbox",      FormType\CheckboxType::class, array("mapped" => false))
             //->add("type_file", "file", array("mapped" => false))
-            ->add("type_radio", "radio", array("mapped" => false))
+            ->add("type_radio",         FormType\RadioType::class, array("mapped" => false))
             ;
 
         $builder
-            ->add("type_collection", "collection", array("mapped" => false))
-            ->add("type_repeated", "repeated", array("mapped" => false))
+            ->add("type_collection",    FormType\CollectionType::class, array("mapped" => false))
+            ->add("type_repeated",      FormType\RepeatedType::class, array("mapped" => false))
             ;
 
         $builder
-            ->add("type_hidden", "hidden", array("mapped" => false))
+            ->add("type_hidden",        FormType\HiddenType::class, array("mapped" => false))
             ;
 
         $builder
-            ->add("type_button", "button")
-            ->add("type_reset", "reset")
-            ->add("type_submit", "submit")
+            ->add("type_button",        FormType\ButtonType::class)
+            ->add("type_reset",         FormType\ResetType::class)
+            ->add("type_submit",        FormType\SubmitType::class)
             ;
 
         $builder
-            ->add("type_form", "form", array("mapped" => false));
+            ->add("type_form", FormType\FormType::class, array("mapped" => false));
     }
 
     public function configureOptions(OptionsResolver $resolver)

@@ -9,6 +9,7 @@
 namespace Form\TypeGuesser;
 
 
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
@@ -17,7 +18,7 @@ class CustomTypeGuesser implements FormTypeGuesserInterface
 {
     public function guessType($class, $property)
     {
-        return new TypeGuess("integer", array(), Guess::HIGH_CONFIDENCE);
+        return new TypeGuess(IntegerType::class, array(), Guess::HIGH_CONFIDENCE);
     }
 
     public function guessRequired($class, $property)
