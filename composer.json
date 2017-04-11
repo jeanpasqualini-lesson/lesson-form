@@ -7,13 +7,15 @@
         "symfony/twig-bridge": "3.0.*",
         "twig/twig" : "~1.0",
         "symfony/translation": "3.0.*",
-        "symfony/config": "3.0.*"
+        "symfony/config": "3.0.*",
+        "phpunit/phpunit": "^4.8",
+        "symfony/stopwatch": "3.0.*"
     },
     "autoload" :
     {
         "psr-4" :
         {
-            "" : "src/"
+            "" : ["demo/", "tests/"]
         }
     },
     "authors": [
