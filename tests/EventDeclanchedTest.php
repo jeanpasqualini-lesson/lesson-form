@@ -1,8 +1,8 @@
 <?php
 namespace Test;
 
-use Symfony\Component\Form\Exception\RuntimeException as FormRuntimeException;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -11,12 +11,10 @@ use Symfony\Component\Form\FormFactoryBuilder;
 class EventDeclanchedTest extends \PHPUnit_Framework_TestCase
 {
     protected $calledEvents;
-    protected $contextEvents;
 
     public function setUp()
     {
         $this->calledEvents = [];
-        $this->contextEvents = [];
     }
 
     /**
@@ -29,6 +27,10 @@ class EventDeclanchedTest extends \PHPUnit_Framework_TestCase
         $formBuilder = (new FormFactoryBuilder())
             ->getFormFactory()
             ->createBuilder($type, $data);
+
+        $formBuilder
+            ->add('title', TextType::class);
+
         $this->registerTraceableListener($formBuilder);
         return $formBuilder->getForm();
     }
@@ -37,24 +39,6 @@ class EventDeclanchedTest extends \PHPUnit_Framework_TestCase
     {
         $eventListenerCallable = function(FormEvent $event, $eventName) {
             $this->calledEvents[] = $eventName;
-            $this->contextEvents[$eventName][] = [];
-            $item = &$this->contextEvents[$eventName][count($this->contextEvents[$eventName]) - 1];
-
-            try {
-                $item['model_data'] = $event->getForm()->getData();
-            } catch (FormRuntimeException $exception) {
-                $item['model_data'] = null;
-            }
-            try {
-                $item['normalized_data'] = $event->getForm()->getNormData();
-            } catch (FormRuntimeException $exception) {
-                $item['normalized_data'] = null;
-            }
-            try {
-                $item['view_data'] = $event->getForm()->getViewData();
-            } catch (FormRuntimeException $exception) {
-                $item['view_data'] = null;
-            }
         };
         $builder
             ->addEventListener(FormEvents::PRE_SET_DATA, $eventListenerCallable)
@@ -82,7 +66,7 @@ class EventDeclanchedTest extends \PHPUnit_Framework_TestCase
             FormEvents::POST_SET_DATA => 1,
         ];
 
-        $this->createForm(FormType::class, []);
+        $this->createForm(FormType::class, ['title' => 'red']);
         $this->assertEquals($expectedCalledEvents, array_count_values($this->calledEvents));
     }
 
@@ -96,7 +80,7 @@ class EventDeclanchedTest extends \PHPUnit_Framework_TestCase
             FormEvents::POST_SUBMIT => 1,
         ];
 
-        $this->createForm(FormType::class, [])->submit([]);
+        $this->createForm(FormType::class, ['title' => 'red'])->submit(['title' => 'green']);
 
         $this->assertEquals($expectedCalledEvents, array_count_values($this->calledEvents));
     }
@@ -104,42 +88,30 @@ class EventDeclanchedTest extends \PHPUnit_Framework_TestCase
     public function testEventWhenSetData()
     {
         $expectedCalledEvents = [
-            FormEvents::PRE_SET_DATA => 2,
-            FormEvents::POST_SET_DATA => 2,
+            FormEvents::PRE_SET_DATA => 1,
+            FormEvents::POST_SET_DATA => 1,
         ];
 
-        $exceptedDataEvents = [
-            FormEvents::PRE_SET_DATA => [
-                [
-                    'model_data' => null,
-                    'normalized_data' => null,
-                    'view_data' => null,
-                ],
-                [
-                    'model_data' => [],
-                    'normalized_data' => [],
-                    'view_data' => [],
-                ]
-            ],
-            FormEvents::POST_SET_DATA => [
-                [
-                    'model_data' => [],
-                    'normalized_data' => [],
-                    'view_data' => [],
-                ],
-                [
-                    'model_data' => [],
-                    'normalized_data' => [],
-                    'view_data' => [],
-                ]
-            ],
-
-        ];
-
-        $this->createForm(FormType::class, [])->setData([]);
-
+        $this->createForm(FormType::class, ['title' => 'red'])->setData(['title' => 'green']);
         $this->assertEquals($expectedCalledEvents, array_count_values($this->calledEvents));
-        $this->assertEquals($exceptedDataEvents, $this->contextEvents);
+    }
+
+    public function testEventWhenSetDataWithCasePreset()
+    {
+        echo PHP_EOL.__METHOD__.PHP_EOL;
+        // Après l'init, les données sont setter
+        // Sachant qu'après le premier set, la modif est bloqué
+        // L'event n'est déclancher que si on passe des donées iso à celle existante dans set data
+        $expectedCalledEvents = [
+            FormEvents::PRE_SET_DATA => 4, // ??
+            FormEvents::POST_SET_DATA => 4, // ??
+        ];
+
+        $this->createForm(FormType::class, null)
+            ->setData(['title' => 'green'])
+            ->setData([])
+            ->setData(['title' => 'green']);
+        $this->assertEquals($expectedCalledEvents, array_count_values($this->calledEvents));
     }
 
 }
