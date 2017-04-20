@@ -98,10 +98,7 @@ class EventDeclanchedTest extends \PHPUnit_Framework_TestCase
 
     public function testEventWhenSetDataWithCasePreset()
     {
-        echo PHP_EOL.__METHOD__.PHP_EOL;
-        // Après l'init, les données sont setter
-        // Sachant qu'après le premier set, la modif est bloqué
-        // L'event n'est déclancher que si on passe des donées iso à celle existante dans set data
+        // When data locked, event set data not trigger
         $expectedCalledEvents = [
             FormEvents::PRE_SET_DATA => 4, // ??
             FormEvents::POST_SET_DATA => 4, // ??
@@ -114,4 +111,16 @@ class EventDeclanchedTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedCalledEvents, array_count_values($this->calledEvents));
     }
 
+    public function testDataLocked()
+    {
+        // When data locked, event set data not trigger
+        $form = $this->createForm(FormType::class, ['title' => 'red']);
+        $this->assertEquals(true, $form->getConfig()->getDataLocked());
+
+        $form = $this->createForm(FormType::class, null);
+        $this->assertEquals(false, $form->getConfig()->getDataLocked());
+
+        $form = $this->createForm(FormType::class, null)->setData(['title' => 'red']);
+        $this->assertEquals(false, $form->getConfig()->getDataLocked());
+    }
 }
