@@ -15,8 +15,7 @@ abstract class PHPUnit_Framework_FakeConstraint extends PHPUnit_Framework_Constr
 
     public function evaluate($other, $description = '', $returnResult = false)
     {
-        self::$export[] = [];
-        $export = &self::$export[count(self::$export) - 1];
+        $export = ['export' => false];
 
         $stack = debug_backtrace(false);
         $location = sprintf(
@@ -60,6 +59,7 @@ abstract class PHPUnit_Framework_FakeConstraint extends PHPUnit_Framework_Constr
                         'reponses' => $reponses,
                         'questions' => $questions
                     ];
+                    $export['export'] = true;
                 }
                 break;
 
@@ -67,6 +67,9 @@ abstract class PHPUnit_Framework_FakeConstraint extends PHPUnit_Framework_Constr
                 break;
         }
 
+        if ($export['export']) {
+            self::$export[] = $export;
+        }
         return true;
     }
 

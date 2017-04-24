@@ -13,7 +13,7 @@ foreach($export as $exportItem) {
                 $questions = $exportItem['question']['questions'];
                 $reponses = $exportItem['question']['reponses'];
 
-                $symfonyStyle->write(implode(PHP_EOL, $exportItem['title']));
+                $symfonyStyle->writeln(implode(PHP_EOL, $exportItem['title']));
                 $errorCount = 0;
                 foreach($questions as $id => $question)
                 {
