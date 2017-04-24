@@ -52,7 +52,15 @@ abstract class PHPUnit_Framework_FakeConstraint extends PHPUnit_Framework_Constr
                     $questions = $reponses;
                     foreach($questions as $id => $question)
                     {
-                        $questions[$id] = $question[0].str_repeat('.', strlen($question) - 2).$question[strlen($question) - 1];
+
+                        $isSnakeCase = (preg_match('/[^A-Z ]+/', $question) && preg_match('/[_]+/', $questions));
+                        $isCamelCase = (preg_match('/[^_ ]+/', $question));
+
+                        if ($isSnakeCase && 1 == 2) {
+                            $questions[$id] = $questions[$id];
+                        } else {
+                            $questions[$id] = $question[0].str_repeat('.', strlen($question) - 2).$question[strlen($question) - 1];
+                        }
                     }
                     $export['question'] = [
                         'type' => 'array_with_one_depth',
