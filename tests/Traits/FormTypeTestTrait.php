@@ -2,6 +2,8 @@
 
 namespace Traits;
 
+use Symfony\Component\Form\Extension\Core\Type\BaseType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 trait FormTypeTestTrait
@@ -12,7 +14,12 @@ trait FormTypeTestTrait
         sort($expected);
         sort($optionsAvailable);
 
-        $this->assertEquals($expected, $optionsAvailable, 'assert options of '.$class);
+        $doc = sprintf(
+            'http://symfony.com/doc/current/reference/forms/types/%s.html',
+            strtolower(str_replace(['Symfony\Component\Form\Extension\Core\Type\\', 'Type'], '', $class))
+        );
+
+        $this->assertEquals($expected, $optionsAvailable, 'assert options of '.$class. 'doc ('.$doc.')');
     }
 
     private function getOptionsAvailable($class)
@@ -27,6 +34,11 @@ trait FormTypeTestTrait
             return array_diff(
                 $optionResolver->getDefinedOptions(),
                 $this->getOptionsAvailable($type->getParent())
+            );
+        } elseif (FormType::class !== $class) {
+            return array_diff(
+                $optionResolver->getDefinedOptions(),
+                $this->getOptionsAvailable(FormType::class)
             );
         }
 

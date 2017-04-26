@@ -13,6 +13,26 @@ abstract class PHPUnit_Framework_FakeConstraint extends PHPUnit_Framework_Constr
         $this->arguments = func_get_args();
     }
 
+    private function formatSnakeCase($value)
+    {
+        $stringSplitted = str_split($value);
+
+        foreach($stringSplitted as $position => $character)
+        {
+            $previousCharacter = $value[$position - 1] ?? null;
+            $nextCharacter = $value[$position + 1] ?? null;
+
+            $start = $position === 0;
+            $end = $position === count($stringSplitted) - 1;
+
+            if (!$start && !$end && !in_array('_', [$previousCharacter, $nextCharacter, $character])) {
+                $value[$position] = '.';
+            }
+        }
+
+        return $value;
+    }
+
     public function evaluate($other, $description = '', $returnResult = false)
     {
         $export = ['export' => false];
@@ -53,11 +73,11 @@ abstract class PHPUnit_Framework_FakeConstraint extends PHPUnit_Framework_Constr
                     foreach($questions as $id => $question)
                     {
 
-                        $isSnakeCase = (preg_match('/[^A-Z ]+/', $question) && preg_match('/[_]+/', $questions));
+                        $isSnakeCase = (preg_match('/[^A-Z ]+/', $question) && preg_match('/[_]+/', $question));
                         $isCamelCase = (preg_match('/[^_ ]+/', $question));
 
-                        if ($isSnakeCase && 1 == 2) {
-                            $questions[$id] = $questions[$id];
+                        if ($isSnakeCase) {
+                            $questions[$id] = $this->formatSnakeCase($questions[$id]);
                         } else {
                             $questions[$id] = $question[0].str_repeat('.', strlen($question) - 2).$question[strlen($question) - 1];
                         }
