@@ -13,41 +13,20 @@ abstract class PHPUnit_Framework_FakeConstraint extends PHPUnit_Framework_Constr
         $this->arguments = func_get_args();
     }
 
-    private function formatSnakeCase($value)
-    {
-        $stringSplitted = str_split($value);
-
-        foreach($stringSplitted as $position => $character)
-        {
-            $previousCharacter = $value[$position - 1] ?? null;
-            $nextCharacter = $value[$position + 1] ?? null;
-
-            $start = $position === 0;
-            $end = $position === count($stringSplitted) - 1;
-
-            if (!$start && !$end && !in_array('_', [$previousCharacter, $nextCharacter, $character])) {
-                $value[$position] = '.';
-            }
-        }
-
-        return $value;
-    }
-
     public function evaluate($other, $description = '', $returnResult = false)
     {
         $export = ['export' => false];
 
         $stack = debug_backtrace(false);
         $location = sprintf(
-            '%s:%s:%s (%s).',
+            '%s:%s:%s',
             $stack[3]['class'],
             $stack[3]['function'],
-            $stack[2]['function'],
-            $description
+            $stack[2]['function']
         );
         $lines = file($stack[2]['file']);
-        $export['title'] = ['<error>'.$location.'</error>'];
-        $export['title'][] = '<info>'.trim(implode(PHP_EOL, array_slice($lines, $stack[2]['line'] - 1, 1))).'</info>';
+        $export['description'] = substr($description, 0, 200);
+        $export['code'] = trim(implode(PHP_EOL, array_slice($lines, $stack[2]['line'] - 1, 1)));
 
         switch($this->getConstraintName())
         {
@@ -66,26 +45,10 @@ abstract class PHPUnit_Framework_FakeConstraint extends PHPUnit_Framework_Constr
                 }
 
                 if ($yes) {
-                    $export['title'][] = '3 erreurs max.';
-                    $export['title'][] = 'il y a '.count($value). ' elements à deviner';
-                    $reponses = $value;
-                    $questions = $reponses;
-                    foreach($questions as $id => $question)
-                    {
-
-                        $isSnakeCase = (preg_match('/[^A-Z ]+/', $question) && preg_match('/[_]+/', $question));
-                        $isCamelCase = (preg_match('/[^_ ]+/', $question));
-
-                        if ($isSnakeCase) {
-                            $questions[$id] = $this->formatSnakeCase($questions[$id]);
-                        } else {
-                            $questions[$id] = $question[0].str_repeat('.', strlen($question) - 2).$question[strlen($question) - 1];
-                        }
-                    }
-                    $export['question'] = [
+                    $export['location'] = $location;
+                    $export['assert'] = [
                         'type' => 'array_with_one_depth',
-                        'reponses' => $reponses,
-                        'questions' => $questions
+                        'expect' => $value,
                     ];
                     $export['export'] = true;
                 }

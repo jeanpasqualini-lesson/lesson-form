@@ -19,7 +19,7 @@ trait FormTypeTestTrait
             strtolower(str_replace(['Symfony\Component\Form\Extension\Core\Type\\', 'Type'], '', $class))
         );
 
-        $this->assertEquals($expected, $optionsAvailable, 'assert options of '.$class. 'doc ('.$doc.')');
+        $this->assertEquals($expected, $optionsAvailable, ''.$class. PHP_EOL. '('.$doc.')');
     }
 
     private function getOptionsAvailable($class)
