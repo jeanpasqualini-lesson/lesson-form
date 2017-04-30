@@ -34,6 +34,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\Extension\Core\Type\TimezoneType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
+use Symfony\Component\Form\Form;
 use Traits\FormTypeTestTrait;
 
 class FormTypeOptionsTest extends \PHPUnit_Framework_TestCase
@@ -42,11 +43,11 @@ class FormTypeOptionsTest extends \PHPUnit_Framework_TestCase
 
     public function provideTestOptions()
     {
-        yield [BirthdayType::class];
+        yield [BirthdayType::class, [], DateType::class];
 
-        yield [ButtonType::class];
+        yield [ButtonType::class, [], null];
 
-        yield [CheckboxType::class, ['value']];
+        yield [CheckboxType::class, ['value'], FormType::class];
 
         yield [ChoiceType::class, [
             'choice_attr',
@@ -62,7 +63,7 @@ class FormTypeOptionsTest extends \PHPUnit_Framework_TestCase
             'multiple',
             'placeholder',
             'preferred_choices',
-        ]];
+        ], FormType::class];
 
         yield [CollectionType::class, [
             'allow_add',
@@ -73,11 +74,11 @@ class FormTypeOptionsTest extends \PHPUnit_Framework_TestCase
             'prototype',
             'prototype_data',
             'prototype_name',
-        ]];
+        ], FormType::class];
 
-        yield [CountryType::class];
+        yield [CountryType::class, [], ChoiceType::class];
 
-        yield [CurrencyType::class];
+        yield [CurrencyType::class, [], ChoiceType::class];
 
         yield [DateType::class, [
             'choice_translation_domain',
@@ -91,7 +92,7 @@ class FormTypeOptionsTest extends \PHPUnit_Framework_TestCase
             'view_timezone',
             'widget',
             'years',
-        ]];
+        ], FormType::class];
 
         yield [DateTimeType::class, [
             'choice_translation_domain',
@@ -113,11 +114,11 @@ class FormTypeOptionsTest extends \PHPUnit_Framework_TestCase
             'with_minutes',
             'with_seconds',
             'years'
-        ]];
+        ], FormType::class];
 
-        yield [EmailType::class, []];
+        yield [EmailType::class, [], TextType::class];
 
-        yield [FileType::class, ['multiple']];
+        yield [FileType::class, ['multiple'], FormType::class];
 
         yield [
             FormType::class,
@@ -136,40 +137,41 @@ class FormTypeOptionsTest extends \PHPUnit_Framework_TestCase
                 'by_reference',
                 'compound',
                 'disabled'
-            ]
+            ],
+            null
         ];
 
-        yield [HiddenType::class, []];
+        yield [HiddenType::class, [], FormType::class];
 
-        yield [IntegerType::class, ['grouping', 'rounding_mode', 'scale']];
+        yield [IntegerType::class, ['grouping', 'rounding_mode', 'scale'], FormType::class];
 
-        yield [LanguageType::class];
+        yield [LanguageType::class, [], ChoiceType::class];
 
-        yield [LocaleType::class];
+        yield [LocaleType::class, [], ChoiceType::class];
 
-        yield [MoneyType::class, ['currency', 'divisor', 'grouping', 'scale']];
+        yield [MoneyType::class, ['currency', 'divisor', 'grouping', 'scale'], FormType::class];
 
-        yield [NumberType::class, ['grouping', 'rounding_mode', 'scale']];
+        yield [NumberType::class, ['grouping', 'rounding_mode', 'scale'], FormType::class];
 
-        yield [PasswordType::class, ['always_empty', 'trim']];
+        yield [PasswordType::class, ['always_empty', 'trim'], TextType::class];
 
-        yield [PercentType::class, ['scale', 'type']];
+        yield [PercentType::class, ['scale', 'type'], FormType::class];
 
-        yield [RadioType::class];
+        yield [RadioType::class, [], CheckboxType::class];
 
-        yield [RangeType::class, []];
+        yield [RangeType::class, [], TextType::class];
 
-        yield [RepeatedType::class, ['type', 'first_name', 'first_options', 'options', 'second_name', 'second_options']];
+        yield [RepeatedType::class, ['type', 'first_name', 'first_options', 'options', 'second_name', 'second_options'], FormType::class];
 
-        yield [ResetType::class];
+        yield [ResetType::class, [], ButtonType::class];
 
-        yield [SearchType::class];
+        yield [SearchType::class, [], TextType::class];
 
-        yield [SubmitType::class];
+        yield [SubmitType::class, [], ButtonType::class];
 
-        yield [TextType::class];
+        yield [TextType::class, [], FormType::class];
 
-        yield [TextareaType::class];
+        yield [TextareaType::class, [], TextType::class];
 
         yield [TimeType::class, [
             'choice_translation_domain',
@@ -184,7 +186,7 @@ class FormTypeOptionsTest extends \PHPUnit_Framework_TestCase
             'widget',
             'with_minutes',
             'with_seconds'
-        ]];
+        ], FormType::class];
 
         yield [TimezoneType::class];
 
@@ -201,9 +203,8 @@ class FormTypeOptionsTest extends \PHPUnit_Framework_TestCase
         $this->assertFormHasOptionsAvailable($expected, $class);
     }
 
-    public function testTypes()
+    private function getTypes($string = true)
     {
-        $expected = array_column(iterator_to_array($this->provideTestOptions()), 0);
         $types = new Class extends CoreExtension
         {
             public function getTypes()
@@ -211,8 +212,18 @@ class FormTypeOptionsTest extends \PHPUnit_Framework_TestCase
                 return $this->loadTypes();
             }
         };
-        $types = array_map('get_class', $types->getTypes());
 
+        if (!$string) {
+           return $types->getTypes();
+        }
+
+        return array_map('get_class', $types->getTypes());
+    }
+
+    public function testTypes()
+    {
+        $expected = array_column(iterator_to_array($this->provideTestOptions()), 0);
+        $types = $this->getTypes();
         $getShortName = function($item) { return substr(strrchr($item, "\\"), 1); };
         $expected = array_map($getShortName, $expected);
         $types = array_map($getShortName, $types);
@@ -221,5 +232,15 @@ class FormTypeOptionsTest extends \PHPUnit_Framework_TestCase
         sort($types);
 
         $this->assertEquals($expected, $types);
+    }
+
+    /**
+     * @dataProvider provideTestOptions
+     */
+    public function testParent($class, $expectOptions = null, $expectParentType = false)
+    {
+        if (false !== $expectParentType) {
+            $this->assertEquals($expectParentType, (new $class())->getParent(), $class);
+        }
     }
 }
